@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # coding: utf-8
 
-# In[70]:
+# In[34]:
 
 
 import pandas as pd
@@ -10,13 +10,13 @@ import seaborn as sns
 from scipy.stats import linregress
 
 
-# In[71]:
+# In[35]:
 
 
 df = pd.read_csv(r'c:/users/srinivas/Overload Ware Labs AI/Data/Train.csv')
 
 
-# In[72]:
+# In[36]:
 
 
 df
@@ -24,7 +24,7 @@ df
 
 # To see the first 5 rows
 
-# In[73]:
+# In[37]:
 
 
 df.head()
@@ -32,54 +32,75 @@ df.head()
 
 # To Check the number of rows and columns - (How big and To find out Column types and missing values)
 
-# In[74]:
+# In[38]:
 
 
-df.shape
+df.shape # looking at the shape of data
 
 
 # To show summary of columns and datatypes
 
-# In[75]:
+# In[39]:
 
 
-df.info()
+df.info()  # taking a look at info of the data.
 
 
 # To Check for missing values in each column
 
-# In[76]:
+# In[40]:
 
 
-df.isnull().sum()
+df.isnull().sum() # checking for null values using missingno module
+
+
+# In[81]:
+
+
+df.describe() # getting description of data
+
+
+# In[82]:
+
+
+# heatmap of the data for checking the correlation between the features and target column.
+plt.figure(figsize = (18, 7))
+sns.heatmap(df.corr(numeric_only=True), annot = True, fmt = '0.2f', annot_kws = {'size' : 15}, linewidth = 5, linecolor = 'Red')
+plt.show()
 
 
 # #Quick numeric overview
 
-# In[77]:
+# In[ ]:
 
 
-df.describe()
+
+
+
+# In[83]:
+
+
+Exploratory Data Analysis (EDA)
 
 
 # Lets Analyze the given data
 
 # Q1: What % of shipments are delayed?
 
-# In[78]:
+# In[84]:
 
 
 # 0 = Delayed, 1 = On Time (precise insight - float64)
 delayed_count = df['Reached.on.Time_Y.N'].value_counts(normalize=True) * 100 
 
 
-# In[79]:
+# In[85]:
 
 
 delayed_count
 
 
-# In[80]:
+# In[86]:
 
 
 # On-time vs Delayed counts
@@ -96,7 +117,7 @@ plt.show()
 
 # Q2: Which shipping mode has the highest delay rate? (Road vs ship vs flight)
 
-# In[81]:
+# In[87]:
 
 
 #To Filter only delayed orders
@@ -108,7 +129,7 @@ shipment_mode_delay
 shipment_mode_delay.round(2)
 
 
-# In[82]:
+# In[88]:
 
 
 delayed_df = df[df['Reached.on.Time_Y.N'] == 0]
@@ -124,7 +145,7 @@ plt.show()
 
 # Q3: high-priority products get delayed more or less?
 
-# In[83]:
+# In[89]:
 
 
 # Delay rate by product importance
@@ -132,7 +153,7 @@ delay_by_importance = delayed_orders['Product_importance'].value_counts(normaliz
 delay_by_importance.round(2)
 
 
-# In[84]:
+# In[90]:
 
 
 importance_counts = delayed_df['Product_importance'].value_counts(normalize=True) * 100
@@ -145,14 +166,14 @@ plt.show()
 
 # Q4: Does higher discounts lead to more delivery delays?
 
-# In[85]:
+# In[91]:
 
 
 # Average discount for on-time vs delayed deliveries
 df.groupby('Reached.on.Time_Y.N')['Discount_offered'].mean().round(2)
 
 
-# In[86]:
+# In[92]:
 
 
 df.groupby('Reached.on.Time_Y.N')['Discount_offered'].mean().plot(kind='bar', figsize=(6, 4))
@@ -165,14 +186,14 @@ plt.show()
 
 # Q5: To find out which warehouses have the most delivery delays?
 
-# In[87]:
+# In[93]:
 
 
 warehouse_delay_counts = delayed_orders['Warehouse_block'].value_counts()
 warehouse_delay_counts
 
 
-# In[88]:
+# In[94]:
 
 
 delayed_df['Warehouse_block'].value_counts().plot(kind='bar', figsize=(6, 4))
@@ -185,7 +206,7 @@ plt.show()
 
 # Q6: What was the Customer Rating? And was the product delivered on time?
 
-# In[99]:
+# In[95]:
 
 
 sns.barplot(x='Customer_rating', y='Reached.on.Time_Y.N', data=df)
@@ -195,9 +216,23 @@ plt.ylabel('Proportion Delivered On Time')
 plt.show()
 
 
+# Does customer calls affect ratings?
+
+# In[96]:
+
+
+# making a lineplot to check the relation between customer care calls, customer ratings and gender
+
+plt.figure(figsize = (18, 9))
+sns.lineplot(x='Customer_care_calls', y='Customer_rating', hue='Gender', data=df, errorbar=('ci', 0))
+plt.title('Relation between Customer Care Calls and Customer Rating of Males and Females\n',
+          fontsize = 15)
+plt.show()
+
+
 # Q7: Is Customer Query Being Answered?
 
-# In[93]:
+# In[97]:
 
 
 #More calls → potential delivery issues or product dissatisfaction.
@@ -212,7 +247,7 @@ plt.show()
 
 # a. Product Importance vs On-Time Delivery:
 
-# In[100]:
+# In[98]:
 
 
 sns.barplot(x='Product_importance', y='Reached.on.Time_Y.N', data=df)
@@ -224,7 +259,7 @@ plt.show()
 
 # b. Product Importance vs Customer Rating:
 
-# In[101]:
+# In[99]:
 
 
 sns.boxplot(x='Product_importance', y='Customer_rating', data=df)
@@ -232,6 +267,83 @@ plt.title('Customer Rating by Product Importance')
 plt.xlabel('Product Importance')
 plt.ylabel('Customer Rating')
 plt.show()
+
+
+# In[100]:
+
+
+# making a distplot of cost of the product column
+
+plt.figure(figsize = (15, 7))
+ax = sns.histplot(df['Cost_of_the_Product'], bins = 100, color = 'y')
+
+plt.show()
+
+
+# In[101]:
+
+
+# making a distplot of discount offered column
+
+plt.figure(figsize = (15, 7))
+ax = sns.histplot(df['Discount_offered'], color = 'y')
+
+plt.show()
+
+
+# In[102]:
+
+
+plt.figure(figsize = (15, 7))
+ax = sns.histplot(df['Weight_in_gms'], bins = 100, color = 'y')
+
+plt.show()
+
+
+# Which type of warehouse contains most weights ?
+
+# In[103]:
+
+
+# creating a dataframe of warehouse block and weights in gram columns 
+
+ware_block_weight = df.groupby(['Warehouse_block'])['Weight_in_gms'].sum().reset_index()
+ware_block_weight
+
+
+# Which mode of shipmemnt carries most weights ?
+
+# In[104]:
+
+
+shipment_mode_weight = df.groupby(['Mode_of_Shipment'])['Weight_in_gms'].sum().reset_index()
+shipment_mode_weight
+
+
+# Effect of Warehouse on Cost of Product ?
+
+# In[105]:
+
+
+warehouse_weight = df.groupby(['Warehouse_block'])['Cost_of_the_Product'].sum().reset_index()
+warehouse_weight
+
+
+# In[106]:
+
+
+#creating scatter plot to see the relation between cost of the product and the discount offered and the relation with
+# whether or not th product will reach on time
+plt.figure(figsize = (15, 7))
+sns.scatterplot(x='Discount_offered', y='Cost_of_the_Product', data=df, hue='Reached.on.Time_Y.N')
+
+plt.show()
+
+
+# In[ ]:
+
+
+
 
 
 # In[ ]:
